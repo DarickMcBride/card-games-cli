@@ -1,4 +1,4 @@
-package main
+package deck
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/DarickMcBride/card-games-cli/pkg/card"
 )
 
 func TestDeal(t *testing.T) {
@@ -82,9 +83,9 @@ func TestPrint(t *testing.T) {
 }
 func TestToJson(t *testing.T) {
 	d := Deck{
-		Card{Name: "Two of Spades", Rank: 2},
-		Card{Name: "Three of Spades", Rank: 3},
-		Card{Name: "Four of Spades", Rank: 4},
+		card.Card{Name: "Two of Spades", Rank: 2},
+		card.Card{Name: "Three of Spades", Rank: 3},
+		card.Card{Name: "Four of Spades", Rank: 4},
 		// Add more cards here if needed
 	}
 
@@ -102,9 +103,9 @@ func TestToJson(t *testing.T) {
 
 func TestWriteToFile(t *testing.T) {
 	d := Deck{
-		Card{Name: "Two of Spades", Rank: 2},
-		Card{Name: "Three of Spades", Rank: 3},
-		Card{Name: "Four of Spades", Rank: 4},
+		card.Card{Name: "Two of Spades", Rank: 2},
+		card.Card{Name: "Three of Spades", Rank: 3},
+		card.Card{Name: "Four of Spades", Rank: 4},
 		// Add more cards here if needed
 	}
 
@@ -142,9 +143,9 @@ func TestReadDeckFromFile(t *testing.T) {
 
 	// Create a test deck
 	testDeck := Deck{
-		Card{Name: "Two of Spades", Rank: 2},
-		Card{Name: "Three of Spades", Rank: 3},
-		Card{Name: "Four of Spades", Rank: 4},
+		card.Card{Name: "Two of Spades", Rank: 2},
+		card.Card{Name: "Three of Spades", Rank: 3},
+		card.Card{Name: "Four of Spades", Rank: 4},
 		// Add more cards here if needed
 	}
 

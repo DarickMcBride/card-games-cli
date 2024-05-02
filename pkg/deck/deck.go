@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"os"
+
 	"github.com/DarickMcBride/card-games-cli/pkg/card"
 )
 
 // Create a new type of 'Deck'
 // slice of strings
-type Deck []Card
+type Deck []card.Card
 
 // NewDeck creates and returns a new Deck of cards.
 func NewDeck() Deck {
@@ -22,7 +23,7 @@ func NewDeck() Deck {
 	// create a Deck of cards
 	for _, suit := range cardSuits {
 		for i, rank := range ranks {
-			cards = append(cards, NewCard(rank+" of "+suit, i+2))
+			cards = append(cards, card.NewCard(rank+" of "+suit, i+2))
 		}
 	}
 
