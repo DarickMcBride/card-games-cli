@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"os"
 
 	deck "github.com/DarickMcBride/card-games-cli/pkg/cards"
 )
@@ -54,10 +55,14 @@ func War() {
 		// if one of the players runs out of cards, print the winner
 		if len(playerCards) == 0 {
 			fmt.Println("Bot wins!")
+
 		} else if len(botCards) == 0 {
 			fmt.Println("Player wins!")
+
 		}
 	}
+	fmt.Println("Game Over")
+	os.Exit(0)
 
 }
 

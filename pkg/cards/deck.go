@@ -86,12 +86,22 @@ func (d Deck) WriteToFile(filename string) error {
 	return os.WriteFile(filename, bytes, 0666)
 }
 
-
 // AddToBottom adds one or more cards to the bottom of the deck.
 // The cards are appended to the existing deck in the order they are provided.
 // The deck is modified in-place.
 func (d *Deck) AddToBottom(card ...Card) {
 	*d = append(*d, card...)
+}
+
+
+// AddToTop adds the specified cards to the top of the deck.
+// The cards are added in the order they are passed as arguments.
+// The existing cards in the deck are shifted down to make room for the new cards.
+// The added cards will be the first cards to be drawn from the deck.
+func (d *Deck) AddToTop(cards ...Card) {
+	for i := len(cards) - 1; i >= 0; i-- {
+		*d = append([]Card{cards[i]}, *d...)
+	}
 }
 
 // readDeckFromFile reads a deck of cards from a file and returns it.

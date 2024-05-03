@@ -278,3 +278,51 @@ func TestAddToBottomMultipleCards(t *testing.T) {
 		}
 	}
 }
+
+func TestAddToTop(t *testing.T) {
+	d := Deck{
+		Card{Name: "Two of Spades", Rank: 2},
+		Card{Name: "Three of Spades", Rank: 3},
+		Card{Name: "Four of Spades", Rank: 4},
+	}
+
+	card := Card{Name: "Ace of Spades", Rank: 14}
+	expectedDeckSize := len(d) + 1
+
+	d.AddToTop(card)
+
+	if len(d) != expectedDeckSize {
+		t.Errorf("Expected deck size of %d, but got %d", expectedDeckSize, len(d))
+	}
+
+	if d[0] != card {
+		t.Errorf("Expected first card to be %v, but got %v", card, d[0])
+	}
+}
+
+func TestAddToTopMultipleCards(t *testing.T) {
+	d := Deck{
+		Card{Name: "Two of Spades", Rank: 2},
+		Card{Name: "Three of Spades", Rank: 3},
+		Card{Name: "Four of Spades", Rank: 4},
+	}
+
+	cards := []Card{
+		{Name: "Ace of Spades", Rank: 14},
+		{Name: "King of Spades", Rank: 13},
+		{Name: "Queen of Spades", Rank: 12},
+	}
+	expectedDeckSize := len(d) + len(cards)
+
+	d.AddToTop(cards...)
+
+	if len(d) != expectedDeckSize {
+		t.Errorf("Expected deck size of %d, but got %d", expectedDeckSize, len(d))
+	}
+
+	for i, card := range cards {
+		if d[i] != card {
+			t.Errorf("Expected card %v at index %d, but got %v", card, i, d[i])
+		}
+	}
+}
