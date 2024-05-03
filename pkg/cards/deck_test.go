@@ -2,19 +2,18 @@ package deck
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"reflect"
 	"testing"
-
-	"github.com/DarickMcBride/card-games-cli/pkg/card"
 )
 
 func TestDeal(t *testing.T) {
 	d := NewDeck()
 	handSize := 5
 
-	hand, remaining := d.deal(handSize)
+	hand, remaining := d.Deal(handSize)
 
 	if len(hand) != handSize {
 		t.Errorf("Expected hand size of %d, but got %d", handSize, len(hand))
@@ -49,7 +48,7 @@ func TestShuffle(t *testing.T) {
 	originalDeck := make(Deck, len(d))
 	copy(originalDeck, d)
 
-	d.shuffle()
+	d.Shuffle()
 
 	if len(d) != len(originalDeck) {
 		t.Errorf("Expected deck size to remain the same after shuffling, but got %d", len(d))
@@ -68,7 +67,7 @@ func TestPrint(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	d.print()
+	d.Print()
 
 	// Reset stdout
 	w.Close()
@@ -81,37 +80,18 @@ func TestPrint(t *testing.T) {
 		t.Errorf("Expected output:\n%s\n\nBut got:\n%s", expectedOutput, string(out))
 	}
 }
-func TestToJson(t *testing.T) {
-	d := Deck{
-		card.Card{Name: "Two of Spades", Rank: 2},
-		card.Card{Name: "Three of Spades", Rank: 3},
-		card.Card{Name: "Four of Spades", Rank: 4},
-		// Add more cards here if needed
-	}
-
-	expectedJSON := `[{"Name":"Two of Spades","Rank":2},{"Name":"Three of Spades","Rank":3},{"Name":"Four of Spades","Rank":4}]`
-
-	bytes, err := d.toJson()
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
-	if string(bytes) != expectedJSON {
-		t.Errorf("Expected JSON:\n%s\n\nBut got:\n%s", expectedJSON, string(bytes))
-	}
-}
 
 func TestWriteToFile(t *testing.T) {
 	d := Deck{
-		card.Card{Name: "Two of Spades", Rank: 2},
-		card.Card{Name: "Three of Spades", Rank: 3},
-		card.Card{Name: "Four of Spades", Rank: 4},
+		Card{Name: "Two of Spades", Rank: 2},
+		Card{Name: "Three of Spades", Rank: 3},
+		Card{Name: "Four of Spades", Rank: 4},
 		// Add more cards here if needed
 	}
 
 	filename := "test_deck.json"
 
-	err := d.writeToFile(filename)
+	err := d.WriteToFile(filename)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -143,9 +123,9 @@ func TestReadDeckFromFile(t *testing.T) {
 
 	// Create a test deck
 	testDeck := Deck{
-		card.Card{Name: "Two of Spades", Rank: 2},
-		card.Card{Name: "Three of Spades", Rank: 3},
-		card.Card{Name: "Four of Spades", Rank: 4},
+		Card{Name: "Two of Spades", Rank: 2},
+		Card{Name: "Three of Spades", Rank: 3},
+		Card{Name: "Four of Spades", Rank: 4},
 		// Add more cards here if needed
 	}
 
@@ -162,7 +142,7 @@ func TestReadDeckFromFile(t *testing.T) {
 	}
 
 	// Call the function being tested
-	deck, err := readDeckFromFile(filename)
+	deck, err := ReadDeckFromFile(filename)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -176,5 +156,125 @@ func TestReadDeckFromFile(t *testing.T) {
 	err = os.Remove(filename)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+func TestToJson(t *testing.T) {
+	d := Deck{
+		Card{Name: "Two of Spades", Rank: 2},
+		Card{Name: "Three of Spades", Rank: 3},
+		Card{Name: "Four of Spades", Rank: 4},
+		// Add more cards here if needed
+	}
+
+	expectedBytes, err := json.Marshal(d)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	bytes, err := d.toJson()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	if !reflect.DeepEqual(bytes, expectedBytes) {
+		t.Errorf("Returned bytes do not match the expected bytes")
+	}
+}
+
+func TestDraw(t *testing.T) {
+	d := Deck{
+		Card{Name: "Two of Spades", Rank: 2, Suit: "Spades"},
+		Card{Name: "Three of Spades", Rank: 3, Suit: "Spades"},
+		Card{Name: "Four of Spades", Rank: 4, Suit: "Spades"},
+	}
+
+	expectedCard := Card{Name: "Two of Spades", Rank: 2, Suit: "Spades"}
+	actualCard, err := d.Draw()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	if actualCard != expectedCard {
+		t.Errorf("Expected card %v, but got %v", expectedCard, actualCard)
+	}
+
+	expectedDeckSize := len(d)
+	if len(d) != expectedDeckSize {
+		t.Errorf("Expected deck size of %d, but got %d", expectedDeckSize, len(d))
+	}
+
+	d.Draw()
+
+	// Draw last card
+	expectedCard = Card{Name: "Four of Spades", Rank: 4, Suit: "Spades"}
+	actualCard, err = d.Draw()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	if actualCard != expectedCard {
+		t.Errorf("Expected card %v, but got %v", expectedCard, actualCard)
+	}
+	fmt.Println(d)
+
+	expectedDeckSize = len(d)
+	if len(d) != expectedDeckSize {
+		t.Errorf("Expected deck size of %d, but got %d", expectedDeckSize, len(d))
+	}
+
+	// Draw on empty deck
+	_, err = d.Draw()
+	if err == nil {
+		t.Errorf("Expected error when drawing from an empty deck, but got nil")
+	}
+}
+
+func TestAddToBottom(t *testing.T) {
+	d := Deck{
+		Card{Name: "Two of Spades", Rank: 2},
+		Card{Name: "Three of Spades", Rank: 3},
+		Card{Name: "Four of Spades", Rank: 4},
+	}
+
+	card := Card{Name: "Five of Spades", Rank: 5}
+	expectedDeckSize := len(d) + 1
+
+	d.AddToBottom(card)
+
+	if len(d) != expectedDeckSize {
+		t.Errorf("Expected deck size of %d, but got %d", expectedDeckSize, len(d))
+	}
+
+	if d[len(d)-1] != card {
+		t.Errorf("Expected last card to be %v, but got %v", card, d[len(d)-1])
+	}
+}
+
+
+func TestAddToBottomMultipleCards(t *testing.T) {
+	d := Deck{
+		Card{Name: "Two of Spades", Rank: 2},
+		Card{Name: "Three of Spades", Rank: 3},
+		Card{Name: "Four of Spades", Rank: 4},
+	}
+
+	cards := []Card{
+		{Name: "Five of Spades", Rank: 5},
+		{Name: "Six of Spades", Rank: 6},
+		{Name: "Seven of Spades", Rank: 7},
+	}
+	expectedDeckSize := len(d) + len(cards)
+
+	d.AddToBottom(cards...)
+
+	if len(d) != expectedDeckSize {
+		t.Errorf("Expected deck size of %d, but got %d", expectedDeckSize, len(d))
+	}
+
+	for i, card := range cards {
+		if d[len(d)-len(cards)+i] != card {
+			t.Errorf("Expected card %v at index %d, but got %v", card, len(d)-len(cards)+i, d[len(d)-len(cards)+i])
+		}
 	}
 }
