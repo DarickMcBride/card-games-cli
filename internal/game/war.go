@@ -15,12 +15,9 @@ func War() {
 	// deal the cards to the players splitting the deck in half
 	playerCards, botCards := deck.Deal(26)
 
-	playerScore := 0
-	botScore := 0
-
 	// play the game till one of the players runs out of cards
 	for len(playerCards) > 0 && len(botCards) > 0 {
-		printScores(playerScore, botScore)
+
 		// draw a card from each player's deck
 		playerCard, err := playerCards.Draw()
 		if err != nil {
@@ -40,12 +37,10 @@ func War() {
 		// compare the ranks of the cards
 		if playerCard.Rank > botCard.Rank {
 			fmt.Println("Player takes card!")
-			playerScore++
 			playerCards.AddToBottom(playerCard)
 			playerCards.AddToBottom(botCard)
 		} else if botCard.Rank > playerCard.Rank {
 			fmt.Println("Bot takes card!")
-			botScore++
 			botCards.AddToBottom(botCard)
 			botCards.AddToBottom(playerCard)
 		} else {
@@ -55,14 +50,15 @@ func War() {
 		// if one of the players runs out of cards, print the winner
 		if len(playerCards) == 0 {
 			fmt.Println("Bot wins!")
+			gameOver()
 
 		} else if len(botCards) == 0 {
 			fmt.Println("Player wins!")
+			gameOver()
 
 		}
+
 	}
-	fmt.Println("Game Over")
-	os.Exit(0)
 
 }
 
@@ -78,10 +74,15 @@ func War() {
 // The function prints the results of each war to the console.
 // The updated playerCards and botCards are returned after all wars are resolved.
 func itIsWar(playerCards, botCards deck.Deck) (deck.Deck, deck.Deck) {
+	fmt.Println("It is War!")
 	// check if the players have enough cards to play a war
 	if len(playerCards) < 4 {
+		fmt.Println("Bot wins!")
+		playerCards, _ := deck.Deck{}, deck.Deck{}
 		return playerCards, botCards
 	} else if len(botCards) < 4 {
+		fmt.Println("Player wins!")
+		botCards, _ := deck.Deck{}, deck.Deck{}
 		return playerCards, botCards
 	}
 
@@ -96,21 +97,28 @@ func itIsWar(playerCards, botCards deck.Deck) (deck.Deck, deck.Deck) {
 	fmt.Println("Player drew", playerLastCard)
 	fmt.Println("Bot drew", botLastCard)
 
+	combinedWarCards := append(playerWarCards, botWarCards...)
+
 	if playerLastCard.Rank > botLastCard.Rank {
 		fmt.Println("Player wins the war!")
-		playerCards.AddToBottom(playerWarCards...)
-		playerCards.AddToBottom(botWarCards...)
+		playerRemaining.AddToBottom(combinedWarCards...)
+
 	} else if botLastCard.Rank > playerLastCard.Rank {
 		fmt.Println("Bot wins the war!")
-		botCards.AddToBottom(botWarCards...)
-		botCards.AddToBottom(playerWarCards...)
+		botRemaining.AddToBottom(combinedWarCards...)
+
 	} else {
 		// if there is another war
-		playerCards, botCards = itIsWar(playerRemaining, botRemaining)
+		playerRemaining, botRemaining = itIsWar(playerRemaining, botRemaining)
 	}
 
-	return playerCards, botCards
+	return playerRemaining, botRemaining
 
+}
+
+func gameOver() {
+	fmt.Println("Game Over")
+	os.Exit(0)
 }
 
 func printScores(playerScore, botScore int) {
