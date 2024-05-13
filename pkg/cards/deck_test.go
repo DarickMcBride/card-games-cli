@@ -188,6 +188,7 @@ func TestDraw(t *testing.T) {
 		Card{Name: "Three of Spades", Rank: 3, Suit: "Spades"},
 		Card{Name: "Four of Spades", Rank: 4, Suit: "Spades"},
 	}
+	expectedDeckSize := 2
 
 	expectedCard := Card{Name: "Two of Spades", Rank: 2, Suit: "Spades"}
 	actualCard, err := d.Draw()
@@ -199,7 +200,7 @@ func TestDraw(t *testing.T) {
 		t.Errorf("Expected card %v, but got %v", expectedCard, actualCard)
 	}
 
-	expectedDeckSize := len(d)
+
 	if len(d) != expectedDeckSize {
 		t.Errorf("Expected deck size of %d, but got %d", expectedDeckSize, len(d))
 	}
